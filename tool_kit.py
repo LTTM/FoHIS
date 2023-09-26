@@ -3,8 +3,8 @@ Towards Simulating Foggy and Hazy Images and Evaluating their Authenticity
 Ning Zhang, Lin Zhang*, and Zaixi Cheng
 """
 
+
 import numpy as np
-import scipy.io as sio
 import math
 import cv2
 from PIL import Image
@@ -38,7 +38,7 @@ def elevation_and_distance_estimation(src, depth, vertical_fov, horizontal_angle
         for i in range(height):
             theta = i / (height - 1) * vertical_fov
 
-            horizontal_angle = 0  # the horizontal angles of images in our paper are all 0¡ã
+            horizontal_angle = 0  # the horizontal angles of images in our paper are all 0ï¿½ï¿½
 
             if horizontal_angle == 0:
                 if theta < 0.5 * vertical_fov:

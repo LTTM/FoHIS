@@ -1,0 +1,1 @@
+from .fog import gen_fog
