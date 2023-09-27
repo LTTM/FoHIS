@@ -24,8 +24,8 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
     np.errstate(invalid='ignore', divide='ignore')
 
     # Load rgb and depth image
-    img = cv2.imread(img_path)
-    depth = cv2.imread(depth_path)[:, :, 0].astype(np.float64)
+    img = cv2.imread(str(img_path))
+    depth = cv2.imread(str(depth_path))[:, :, 0].astype(np.float64)
     depth[depth==0] = 1  # the depth_min shouldn't be 0
     depth *= 3
 
@@ -172,4 +172,4 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
     result[:, :, 1] = I[:, :, 1] + O * Ial[:, :, 1]
     result[:, :, 2] = I[:, :, 2] + O * Ial[:, :, 2]
 
-    cv2.imwrite(output_path, result)
+    cv2.imwrite(str(output_path), result)
