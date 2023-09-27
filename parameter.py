@@ -4,7 +4,7 @@ Ning Zhang, Lin Zhang*, and Zaixi Cheng
 """
 
 
-import const
+from . import const
 
 
 # atmosphere

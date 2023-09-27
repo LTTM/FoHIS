@@ -6,9 +6,9 @@ Ning Zhang, Lin Zhang*, and Zaixi Cheng
 
 import cv2
 import numpy as np
-import tool_kit as tk
-from parameter import const
 from pathlib import Path
+from . import tool_kit as tk
+from . parameter import const
 
 
 def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
