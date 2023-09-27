@@ -23,10 +23,8 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
     np.set_printoptions(threshold=np.inf)
     np.errstate(invalid='ignore', divide='ignore')
 
-    # load rgb and depth image
-    img = '../img/img.jpg'
+    # Load rgb and depth image
     img = cv2.imread(img_path)
-    # name = str(img.split('.')[0].split('/')[1])
     depth = cv2.imread(depth_path)[:, :, 0].astype(np.float64)
     depth[depth==0] = 1  # the depth_min shouldn't be 0
     depth *= 3
@@ -34,7 +32,7 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
     I = np.empty_like(img)
     result = np.empty_like(img)
 
-    elevation, distance, angle = tk.elevation_and_distance_estimation(img, depth,
+    elevation, distance, _ = tk.elevation_and_distance_estimation(img, depth,
                                                             const.CAMERA_VERTICAL_FOV,
                                                             const.HORIZONTAL_ANGLE,
                                                             const.CAMERA_ALTITUDE)
@@ -43,7 +41,6 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
     if const.FT != 0:
         perlin = tk.noise(img, depth)
         ECA = const.ECA
-        # ECA = const.ECA * np.exp(-elevation/(const.FT+0.00001))
         c = (1-elevation/(const.FT+0.00001))
         c[c<0] = 0
 
@@ -54,7 +51,6 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
 
     else:
         ECA = const.ECA
-        # ECA = const.ECA * np.exp(-elevation/(const.FT+0.00001))
         ECM = const.ECM
 
 
@@ -171,9 +167,6 @@ def gen_fog(img_path: Path, depth_path: Path, output_path: Path) -> None:
     Ial[:, :, 0] = 225
     Ial[:, :, 1] = 225
     Ial[:, :, 2] = 201
-    # Ial[:, :, 0] = 240
-    # Ial[:, :, 1] = 240
-    # Ial[:, :, 2] = 240
 
     result[:, :, 0] = I[:, :, 0] + O * Ial[:, :, 0]
     result[:, :, 1] = I[:, :, 1] + O * Ial[:, :, 1]
