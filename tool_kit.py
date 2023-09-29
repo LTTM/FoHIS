@@ -9,13 +9,14 @@ import math
 import cv2
 from PIL import Image
 from noise import pnoise3
+from tqdm import tqdm
 
 
 # np.set_printoptions(threshold=np.inf)
 np.errstate(invalid='ignore', divide='ignore')
 
 
-def elevation_and_distance_estimation(src, depth, vertical_fov, horizontal_angle, camera_altitude):
+def elevation_and_distance_estimation(src, depth, vertical_fov, horizontal_angle, camera_altitude, bar=False):
     """
     estimate each pixel's elevation and distance
     :param src: RGB image
@@ -26,19 +27,21 @@ def elevation_and_distance_estimation(src, depth, vertical_fov, horizontal_angle
     :return: elevation and distance
     """
 
-    img = cv2.imread(src)
-    img_dpi = get_image_info(src)
-    height, width = img.shape[:2]
+    img_dpi = (72, 72)
+    height, width = src.shape[:2]
     altitude = np.empty((height, width))
     distance = np.empty((height, width))
     angle = np.empty((height, width))
     depth_min = depth.min()
 
+    if bar:
+        pbar = tqdm(desc='Pixel evaluation', total=height*width, leave=False)
+
     for j in range(width):
         for i in range(height):
             theta = i / (height - 1) * vertical_fov
 
-            horizontal_angle = 0  # the horizontal angles of images in our paper are all 0��
+            horizontal_angle = 0  # the horizontal angles of images in our paper are all 0
 
             if horizontal_angle == 0:
                 if theta < 0.5 * vertical_fov:
@@ -65,14 +68,12 @@ def elevation_and_distance_estimation(src, depth, vertical_fov, horizontal_angle
 
                     altitude[i, j] = max(camera_altitude - depth[i, j]*y1/depth_min, 0)
                     angle[i, j] = -(theta - 0.5 * vertical_fov)
+            
+            if bar:
+                pbar.update(1)
 
     return altitude, distance, angle
 
-
-def get_image_info(src):
-    im = Image.open(src)
-
-    return im.info['dpi']
 
 def noise(Ip, depth):
     p1 = Image.new('L', (Ip.shape[1], Ip.shape[0]))
