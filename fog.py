@@ -6,13 +6,14 @@ from .parameter import const
 
 
 def gen_fog(
-    img_path: Path, depth_path: Path, output_path: Path, bar: bool = False
+    img_path: Path, depth_path: Path, output_path: Path, reduce_lum: int = 0, bar: bool = False
 ) -> None:
     """
     Generate foggy image from rgb image and depth image
     :param img_path: rgb image path
     :param depth_path: depth image path
     :param output_path: output image path
+    :param reduce_lum: factor defining the luminance reduction [0, 255]
     :param bar: whether to show the progress bar
     :return: None
     """
@@ -22,6 +23,12 @@ def gen_fog(
 
     # Load rgb and depth image
     img = cv2.imread(str(img_path))
+
+    # Reduce the luminance of the image if needed
+    if reduce_lum > 0:
+        img[img >= reduce_lum] -= reduce_lum
+        img[img < reduce_lum] = 0
+
     depth = cv2.imread(str(depth_path))[:, :, 0].astype(np.float64)
     depth[depth == 0] = 1  # the depth_min shouldn't be 0
     depth *= 3
