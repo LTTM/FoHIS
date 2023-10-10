@@ -1,12 +1,17 @@
 import cv2
 import numpy as np
+import argparse
 from pathlib import Path
 from . import tool_kit as tk
 from .parameter import const
 
 
 def gen_fog(
-    img_path: Path, depth_path: Path, output_path: Path, reduce_lum: int = 0, bar: bool = False
+    img_path: Path,
+    depth_path: Path,
+    output_path: Path,
+    reduce_lum: int = 0,
+    bar: bool = False,
 ) -> None:
     """
     Generate foggy image from rgb image and depth image
@@ -285,3 +290,52 @@ def gen_fog(
     result[:, :, 2] = I[:, :, 2] + O * Ial[:, :, 2]
 
     cv2.imwrite(str(output_path), result)
+
+
+#### MAIN ####
+
+
+# Create argument parser
+parser = argparse.ArgumentParser(description="Generate fog data")
+
+
+# Defien the parsing functions
+def str2path(str: str) -> None:
+    return Path(str)
+
+
+# Add arguments
+parser.add_argument(
+    "-r", "--rgb", type=str2path, required=True, help="Path to input rgb file"
+)
+parser.add_argument(
+    "-d", "--depth", type=str2path, required=True, help="Path to output depth file"
+)
+parser.add_argument(
+    "-o",
+    "--out",
+    type=str2path,
+    default=Path("./out.png)"),
+    required=False,
+    help="Path to output fog file",
+)
+parser.add_argument(
+    "-l",
+    "--reduce_lum",
+    type=int,
+    default=0,
+    required=False,
+    help="Reduce luminance by this amount",
+)
+
+if __name__ == "__main__":
+    # Parse arguments
+    args = parser.parse_args()
+
+    # Call gen_fog function with arguments
+    gen_fog(
+        img_path=args.rgb,
+        depth_path=args.depth,
+        output_path=args.out,
+        reduce_lum=args.reduce_lum,
+    )
