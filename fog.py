@@ -11,6 +11,7 @@ def gen_fog(
     depth_path: Path,
     output_path: Path,
     reduce_lum: int = 0,
+    depth_multiplier: float = None,
     bar: bool = False,
 ) -> None:
     """
@@ -20,6 +21,7 @@ def gen_fog(
     :param output_path: output image path
     :param reduce_lum: factor defining the luminance reduction [0, 255]
     :param bar: whether to show the progress bar
+    :param depth_multiplier: multiplier for the depthmap (default: None)
     :return: None
     """
 
@@ -36,7 +38,8 @@ def gen_fog(
 
     depth = cv2.imread(str(depth_path))[:, :, 0].astype(np.float64)
     depth[depth == 0] = 1  # the depth_min shouldn't be 0
-    depth *= 3
+    if depth_multiplier is not None:
+        depth *= depth_multiplier
 
     I = np.empty_like(img)
     result = np.empty_like(img)
