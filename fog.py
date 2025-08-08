@@ -1,7 +1,27 @@
-import cv2
-import numpy as np
+"""
+Main module for generating fog.
+
+Constants:
+    None
+
+Raises:
+    FileNotFoundError: If the input image or depth map is not found.
+    ValueError: If the input image and depth map do not have the same dimensions.
+
+Functions:
+    gen_fog: Generate foggy image from rgb image and depth image
+
+Classes:
+    None
+
+Author: Matteo Caligiuri
+"""
+
 import argparse
 from pathlib import Path
+
+import cv2
+import numpy as np
 from . import tool_kit as tk
 from .parameter import const
 
@@ -12,17 +32,21 @@ def gen_fog(
     output_path: Path,
     reduce_lum: int = 0,
     depth_multiplier: float = None,
-    bar: bool = False,
+    p_bar: bool = False,
 ) -> None:
     """
-    Generate foggy image from rgb image and depth image
-    :param img_path: rgb image path
-    :param depth_path: depth image path
-    :param output_path: output image path
-    :param reduce_lum: factor defining the luminance reduction [0, 255]
-    :param bar: whether to show the progress bar
-    :param depth_multiplier: multiplier for the depthmap (default: None)
-    :return: None
+    Generate foggy image from rgb image and depth image.
+
+    Args:
+        img_path (Path): The path to the RGB image.
+        depth_path (Path): The path to the depth image.
+        output_path (Path): The path to the output image.
+        reduce_lum (int, optional): The amount to reduce luminance. Defaults to 0.
+        depth_multiplier (float, optional): The multiplier for the depth map. Defaults to None.
+        p_bar (bool, optional): Whether to show a progress bar. Defaults to False.
+
+    Returns:
+        None
     """
 
     np.set_printoptions(threshold=np.inf)
@@ -50,7 +74,7 @@ def gen_fog(
         const.CAMERA_VERTICAL_FOV,
         const.HORIZONTAL_ANGLE,
         const.CAMERA_ALTITUDE,
-        bar=bar,
+        bar=p_bar,
     )
 
     if const.FT != 0:
@@ -296,15 +320,22 @@ def gen_fog(
 
 
 #### MAIN ####
-
-
 # Create argument parser
 parser = argparse.ArgumentParser(description="Generate fog data")
 
 
-# Defien the parsing functions
-def str2path(str: str) -> None:
-    return Path(str)
+# Define the parsing functions
+def str2path(x: str) -> None:
+    """
+    Convert a string to a Path object.
+
+    Args:
+        x (str): The string to convert.
+
+    Returns:
+        Path: The converted Path object.
+    """
+    return Path(x)
 
 
 # Add arguments
@@ -330,6 +361,7 @@ parser.add_argument(
     required=False,
     help="Reduce luminance by this amount",
 )
+
 
 if __name__ == "__main__":
     # Parse arguments

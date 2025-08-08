@@ -1,21 +1,22 @@
-# Towards Simulating Foggy and Hazy Images and Evaluating their Authenticity
 
-## Instructions
+# 🌫️ FoHIS: Simulating Foggy and Hazy Images
 
-Set the custom parameters in the `parameters.py` file than use the function `fog` to generate the fog. It takes as inputs:
+## 🛠️ Instructions
 
-- `input_img path`: path to the input image,
-- `depth_img path`: path to the depth image,
-- `output_img path`: path to the output image,
-- `luminance reduction factor`: optional parameter that define how much the luminance of the image is reduced. Default value is 0,
+Set your custom parameters in `parameters.py`, then use the function `fog` to generate foggy images. Inputs:
 
-If you want to run this as a standalone code simply run the followinmg command:
+- 🖼️ `input_img path`: Path to the input image
+- 🗺️ `depth_img path`: Path to the depth image
+- 💾 `output_img path`: Path to the output image
+- 💡 `luminance reduction factor`: Optional, controls how much the luminance is reduced (default: 0)
 
-```python
-python fog.py --input_img <path> --depth_img <path> --output_img <path> --reduce_lum
+To run as standalone code, use:
+
+```bash
+python fog.py --input_img <path> --depth_img <path> --output_img <path> --reduce_lum <value>
 ```
 
-## Aknowledgements
+## 🙏 Acknowledgements
 
 This repository is a fork of the one made by Ning Zhang, Lin Zhang, and Zaixi Cheng for their paper [Towards Simulating Foggy and Hazy Images and Evaluating their Authenticity](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123480154.pdf). The original repository can be found [here](https://github.com/zhengziqiang/ForkGAN).
 
