@@ -5,15 +5,18 @@
 
 Set your custom parameters in `parameters.py`, then use the function `fog` to generate foggy images. Inputs:
 
-- 🖼️ `input_img path`: Path to the input image
-- 🗺️ `depth_img path`: Path to the depth image
-- 💾 `output_img path`: Path to the output image
+- 🖼️ `rgb path`: Path to the input image
+- 🗺️ `depth path`: Path to the depth image
+- 💾 `out path`: Path to the output image
 - 💡 `luminance reduction factor`: Optional, controls how much the luminance is reduced (default: 0)
+- 🎨 `saturation reduction factor`: Optional, controls how much the saturation is reduced (default: 0)
+- 🌫️ `depth flattening`: Optional, whether to apply depth flattening (default: False)
+- 🔍 `depth multiplier`: Optional, multiplier for fog intensity (default: None)
 
 To run as standalone code, use:
 
 ```bash
-python fog.py --input_img <path> --depth_img <path> --output_img <path> --reduce_lum <value>
+python fog.py --rgb <path> [--depth <path> [--out <path>] [--reduce_lum <value>] [--reduce_sat <value>] [--depth_flattening] [--depth_multiplier <value>]
 ```
 
 ## 🙏 Acknowledgements

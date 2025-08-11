@@ -31,7 +31,9 @@ def gen_fog(
     depth_path: Path,
     output_path: Path,
     reduce_lum: int = 0,
+    reduce_sat: int = 0,
     depth_multiplier: float = None,
+    depth_flattening: bool = False,
     p_bar: bool = False,
 ) -> None:
     """
@@ -41,8 +43,14 @@ def gen_fog(
         img_path (Path): The path to the RGB image.
         depth_path (Path): The path to the depth image.
         output_path (Path): The path to the output image.
-        reduce_lum (int, optional): The amount to reduce luminance. Defaults to 0.
+        reduce_lum (int, optional): The amount to reduce luminance.
+            Defaults to 0.
+        reduce_sat (int, optional): The amount to reduce saturation.
+            Defaults to 0.
         depth_multiplier (float, optional): The multiplier for the depth map. Defaults to None.
+        depth_flattening (bool): Whether to apply depth flattening.
+            depth = 0.5 + (depth / 2)
+            Defaults to False.
         p_bar (bool, optional): Whether to show a progress bar. Defaults to False.
 
     Returns:
@@ -56,14 +64,29 @@ def gen_fog(
     img = cv2.imread(str(img_path))
 
     # Reduce the luminance of the image if needed
-    if reduce_lum > 0:
-        img[img >= reduce_lum] -= reduce_lum
-        img[img < reduce_lum] = 0
+    if reduce_lum > 0 or reduce_sat > 0:
+        # Convert the image to HSV as int
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.int32)
+
+        # Reduce the luminace by reduce_lum
+        if reduce_sat > 0:
+            img[:, :, 1] -= reduce_sat
+        # Reduce the saturation by reduce_sat
+        if reduce_lum > 0:
+            img[:, :, 2] -= reduce_lum
+        # Ensure that there is no < 0 value
+        img[img < 0] = 0
+
+        # Convert the image back to BGR as uint8
+        img = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_HSV2BGR)
 
     depth = cv2.imread(str(depth_path))[:, :, 0].astype(np.float64)
     depth[depth == 0] = 1  # the depth_min shouldn't be 0
     if depth_multiplier is not None:
         depth *= depth_multiplier
+
+    if depth_flattening:
+        depth = 0.5 + (depth / 2)
 
     I = np.empty_like(img)
     result = np.empty_like(img)
@@ -310,7 +333,7 @@ def gen_fog(
     Ial = np.empty_like(img)  # color of the fog/haze
     Ial[:, :, 0] = 225
     Ial[:, :, 1] = 225
-    Ial[:, :, 2] = 201
+    Ial[:, :, 2] = 225
 
     result[:, :, 0] = I[:, :, 0] + O * Ial[:, :, 0]
     result[:, :, 1] = I[:, :, 1] + O * Ial[:, :, 1]
@@ -343,7 +366,7 @@ parser.add_argument(
     "-r", "--rgb", type=str2path, required=True, help="Path to input rgb file"
 )
 parser.add_argument(
-    "-d", "--depth", type=str2path, required=True, help="Path to output depth file"
+    "-d", "--depth", type=str2path, required=True, help="Path to input depth file"
 )
 parser.add_argument(
     "-o",
@@ -361,6 +384,30 @@ parser.add_argument(
     required=False,
     help="Reduce luminance by this amount",
 )
+parser.add_argument(
+    "-s",
+    "--reduce_sat",
+    type=int,
+    default=0,
+    required=False,
+    help="Reduce saturation by this amount",
+)
+parser.add_argument(
+    "-f",
+    "--depth-flattening",
+    action="store_true",
+    default=False,
+    required=False,
+    help="Apply depth flattening",
+)
+parser.add_argument(
+    "-m",
+    "--depth-multiplier",
+    type=float,
+    default=None,
+    required=False,
+    help="Multiplier for fog intensity",
+)
 
 
 if __name__ == "__main__":
@@ -373,4 +420,7 @@ if __name__ == "__main__":
         depth_path=args.depth,
         output_path=args.out,
         reduce_lum=args.reduce_lum,
+        reduce_sat=args.reduce_sat,
+        depth_flattening=args.depth_flattening,
+        depth_multiplier=args.depth_multiplier,
     )
