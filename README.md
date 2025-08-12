@@ -23,4 +23,7 @@ python fog.py --rgb <path> [--depth <path> [--out <path>] [--reduce-lum <value>]
 
 This repository is a fork of the one made by Ning Zhang, Lin Zhang, and Zaixi Cheng for their paper [Towards Simulating Foggy and Hazy Images and Evaluating their Authenticity](https://link.springer.com/chapter/10.1007/978-3-319-70090-8_42). The original repository can be found [here](https://github.com/noahzn/FoHIS).
 
-This specific fork was created and maintained by [Matteo Caligiuri](https://github.com/matteocali).
+This specific fork was created by:
+
+- [Matteo Caligiuri](https://github.com/matteocali),
+- [Francesco Barbato](https://github.com/barbafrank).
