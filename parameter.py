@@ -17,6 +17,6 @@ const.FT = 31  # FOG_TOP m
 const.HT = 300  # HAZE_TOP m
 
 # camera
-const.CAMERA_ALTITUDE = 50  #  m
-const.HORIZONTAL_ANGLE = 0  #  °
+const.CAMERA_ALTITUDE = 80  #  m
+const.HORIZONTAL_ANGLE = -30  #  °
 const.CAMERA_VERTICAL_FOV = 64  #  °
