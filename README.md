@@ -10,13 +10,13 @@ Set your custom parameters in `parameters.py`, then use the function `fog` to ge
 - 💾 `out path`: Path to the output image
 - 💡 `luminance reduction factor`: Optional, controls how much the luminance is reduced (default: 0)
 - 🎨 `saturation reduction factor`: Optional, controls how much the saturation is reduced (default: 0)
-- 🌫️ `depth flattening`: Optional, whether to apply depth flattening (default: False)
-- 🔍 `depth multiplier`: Optional, multiplier for fog intensity (default: None)
+- 🌈 `apply color scheme`: Optional, if True applies a premade color scheme that enhances the fog effect (default: False)
+- 🌫️ `min-depth`: Optional, sets the minimum depth for the fog effect (default: 1)
 
 To run as standalone code, use:
 
 ```bash
-python fog.py --rgb <path> [--depth <path> [--out <path>] [--reduce_lum <value>] [--reduce_sat <value>] [--depth_flattening] [--depth_multiplier <value>]
+python fog.py --rgb <path> [--depth <path> [--out <path>] [--reduce-lum <value>] [--reduce-sat <value>] [--color-scheme] [--min-depth <value>]
 ```
 
 ## 🙏 Acknowledgements

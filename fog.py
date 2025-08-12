@@ -26,14 +26,24 @@ from . import tool_kit as tk
 from .parameter import const
 
 
+# Define the default import
+__all__ = ["gen_fog"]
+
+
+# Define the constants
+WHITE = np.array([220, 240, 255], dtype=np.uint8)  # BGR
+SATURATION = 0.7
+LUMINOSITY = 0.8
+
+
 def gen_fog(
     img_path: Path,
     depth_path: Path,
     output_path: Path,
+    min_depth: int = 1,
     reduce_lum: int = 0,
     reduce_sat: int = 0,
-    depth_multiplier: float = None,
-    depth_flattening: bool = False,
+    apply_color_scheme: bool = False,
     p_bar: bool = False,
 ) -> None:
     """
@@ -43,14 +53,16 @@ def gen_fog(
         img_path (Path): The path to the RGB image.
         depth_path (Path): The path to the depth image.
         output_path (Path): The path to the output image.
+        min_depth (int, optional): The minimum distance in meters.
+            Default to 1.
         reduce_lum (int, optional): The amount to reduce luminance.
             Defaults to 0.
         reduce_sat (int, optional): The amount to reduce saturation.
             Defaults to 0.
-        depth_multiplier (float, optional): The multiplier for the depth map. Defaults to None.
-        depth_flattening (bool): Whether to apply depth flattening.
-            depth = 0.5 + (depth / 2)
-            Defaults to False.
+        apply_color_scheme (bool, optional): If True apply a premade color scheme that
+            enhances the fog effect. If True the reduce_lum and reduce_sat parameters
+            will be ignored.
+            Default False.
         p_bar (bool, optional): Whether to show a progress bar. Defaults to False.
 
     Returns:
@@ -63,8 +75,17 @@ def gen_fog(
     # Load rgb and depth image
     img = cv2.imread(str(img_path))
 
+    # Apply the foggy color scheme
+    if apply_color_scheme:
+        img = img.astype(np.float32)
+        white = WHITE * img.max() / 255.0
+        img = 255 * img / white
+        gray = img.mean(axis=-1, keepdims=True)
+        img = SATURATION * img + (1.0 - SATURATION) * gray
+        img = LUMINOSITY * img
+        img = np.round(np.clip(img, 0, 255)).astype(np.uint8)
     # Reduce the luminance of the image if needed
-    if reduce_lum > 0 or reduce_sat > 0:
+    elif not apply_color_scheme and (reduce_lum > 0 or reduce_sat > 0):
         # Convert the image to HSV as int
         img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.int32)
 
@@ -80,13 +101,15 @@ def gen_fog(
         # Convert the image back to BGR as uint8
         img = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_HSV2BGR)
 
-    depth = cv2.imread(str(depth_path))[:, :, 0].astype(np.float64)
-    depth[depth == 0] = 1  # the depth_min shouldn't be 0
-    if depth_multiplier is not None:
-        depth *= depth_multiplier
+    # Load the depth map as a uint-16
+    depth = cv2.imread(str(depth_path), cv2.IMREAD_UNCHANGED) / (2**16 - 1)
 
-    if depth_flattening:
-        depth = 0.5 + (depth / 2)
+    # Rescale teh depthmap
+    # Multiply by 254 and add min_depth so that the depth ranges from
+    # (min_depth)m to (min_depth + 254)m
+    depth *= 254
+    depth += min_depth
+    depth = np.round(depth)
 
     I = np.empty_like(img)
     result = np.empty_like(img)
@@ -393,20 +416,20 @@ parser.add_argument(
     help="Reduce saturation by this amount",
 )
 parser.add_argument(
-    "-f",
-    "--depth-flattening",
-    action="store_true",
+    "-c",
+    "--color-scheme",
     default=False,
+    action="store_true",
     required=False,
-    help="Apply depth flattening",
+    help="apply a color scheme to the image",
 )
 parser.add_argument(
     "-m",
-    "--depth-multiplier",
-    type=float,
-    default=None,
+    "--min-depth",
+    default=1,
+    type=int,
     required=False,
-    help="Multiplier for fog intensity",
+    help="minimum depth value in meters (default: 1)",
 )
 
 
@@ -421,6 +444,6 @@ if __name__ == "__main__":
         output_path=args.out,
         reduce_lum=args.reduce_lum,
         reduce_sat=args.reduce_sat,
-        depth_flattening=args.depth_flattening,
-        depth_multiplier=args.depth_multiplier,
+        apply_color_scheme=args.color_scheme,
+        min_depth=args.min_depth,
     )
